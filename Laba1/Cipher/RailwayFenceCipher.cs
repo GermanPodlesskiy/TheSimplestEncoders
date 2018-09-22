@@ -75,14 +75,7 @@ namespace Laba1.Cipher
 					direction = false;
 				}
 
-				if (direction == true)
-				{
-					i++;
-				}
-				else
-				{
-					i--;
-				}
+                i = direction ? i++ : i--;
 				j++;
 			}
 
@@ -100,7 +93,6 @@ namespace Laba1.Cipher
 				}
 				i++;
 			}
-
 			return result;
 		}
 
@@ -132,15 +124,8 @@ namespace Laba1.Cipher
 					direction = false;
 				}
 
-				if (direction == true)
-				{
-					i++;
-				}
-				else
-				{
-					i--;
-				}
-				j++;
+                i = direction ? i++ : i--;
+                j++;
 			}
 
 			i = 0;
@@ -191,13 +176,12 @@ namespace Laba1.Cipher
 		{
 			plaintext.ToUpper();
 			plaintext = Regex.Replace(plaintext, @"[^A-Z]", "");
-			if (plaintext == "")
+			if (String.IsNullOrEmpty(plaintext))
 			{
 				errors.Empty();
 				return true;
 			}
-			else
-				return false;
+			return false;
 		}
 	}
 }
