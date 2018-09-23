@@ -28,12 +28,7 @@ namespace Laba1.Cipher
 		{
 			get
 			{
-				if (lengthKey.Value != null)
-				{
-					return lengthKey.Value;
-				}
-
-				return 0;
+				return lengthKey.Value.Equals(null) ? lengthKey.Value : 0;
 			}
 		}
 
@@ -116,7 +111,6 @@ namespace Laba1.Cipher
 
 		public string Decryption(string ciphertext)
 		{
-
 			int N = characters.Length;
 			if (InputValidationPlaintext(ref ciphertext))
 			{
@@ -234,8 +228,7 @@ namespace Laba1.Cipher
 			{
 				result.Add(new Pair() { Index = i, Value = nodsAll[i] });
 			}
-
-		
+            
 			var resulSortTake2 = result.OrderByDescending(u => u.Value).Take(1);
 
 			lengthKey = resulSortTake2.Cast<Pair>().First().Index;
@@ -304,13 +297,12 @@ namespace Laba1.Cipher
 		{
 			plaintext.ToUpper();
 			plaintext = Regex.Replace(plaintext, @"[^А-ЯЁ]+", "");
-			if (plaintext == "")
+			if (String.IsNullOrEmpty(plaintext))
 			{
 				errors.Empty();
 				return true;
 			}
-			else
-				return false;
+			return false;
 		}
 	}
 }

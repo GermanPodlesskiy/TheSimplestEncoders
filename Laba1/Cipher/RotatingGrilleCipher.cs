@@ -34,11 +34,10 @@ namespace Laba1.Cipher
 
 		public bool Error { get { return false; } }
 
-
 		public string Encryption(string plaintext)
 		{
 			plaintext = plaintext.ToUpper();
-			if (InputValidationPlaintext(ref plaintext))
+			if (new RailwayFenceCipher().InputValidationPlaintext(ref plaintext))
 			{
 				return null;
 			}
@@ -119,14 +118,10 @@ namespace Laba1.Cipher
 
 		public string Decryption(string ciphertext)
 		{
-			ciphertext = ciphertext.ToUpper();
-			if (ciphertext.Length % 16 != 0)
+			ciphertext = ciphertext.ToUpper();         
+			if ((ciphertext.Length % 16 != 0) || (new RailwayFenceCipher().InputValidationPlaintext(ref ciphertext)))
 			{
 				error.ValidationRotation();
-				return null;
-			}
-			if (InputValidationPlaintext(ref ciphertext))
-			{
 				return null;
 			}
 
@@ -194,29 +189,12 @@ namespace Laba1.Cipher
 		
 		private char[,] ClearMatrix(char[,] matrix)
 		{
-			//Random random = new Random();
 			for (int i = 0; i < COUNT_COLS; i++)
 			for (int j = 0; j < COUNT_COLS; j++)
 			{
-					//int temp = random.Next(0,characters.Length - 1 );
-					//matrix[i, j] = characters[temp];
-					matrix[i, j] = '*';
-				}
-				
+				matrix[i, j] = '*';
+			}	
 			return matrix;
-		}
-		private bool InputValidationPlaintext(ref string plaintext)
-		{
-			plaintext = plaintext.ToUpper();
-			plaintext = Regex.Replace(plaintext, @"[^A-Z*]+", "");
-
-			if (plaintext == "")
-			{
-				error.Empty();
-				return true;
-			}
-			else
-				return false;
 		}
 	}
 }

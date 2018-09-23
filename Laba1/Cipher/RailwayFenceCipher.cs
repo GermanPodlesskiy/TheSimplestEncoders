@@ -161,7 +161,7 @@ namespace Laba1.Cipher
 			try
 			{
 				if (Convert.ToUInt16(key) <= 0)
-						return true;
+					return true;
 			}
 			catch (Exception e)
 			{
@@ -172,7 +172,7 @@ namespace Laba1.Cipher
 			return false;
 		}
 
-		private bool InputValidationPlaintext(ref string plaintext)
+		public bool InputValidationPlaintext(ref string plaintext)
 		{
 			plaintext.ToUpper();
 			plaintext = Regex.Replace(plaintext, @"[^A-Z]", "");
