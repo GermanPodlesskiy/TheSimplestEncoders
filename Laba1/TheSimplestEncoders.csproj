@@ -6,12 +6,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{869FA65E-FCB9-4B17-A17B-376EC72461CD}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Laba1</RootNamespace>
-    <AssemblyName>Laba1</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <RootNamespace>TheSimplestEncoders</RootNamespace>
+    <AssemblyName>TheSimplestEncoders</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,8 +50,9 @@
   <ItemGroup>
     <Compile Include="Cipher\RailwayFenceCipher.cs" />
     <Compile Include="Cipher\RotatingGrilleCipher.cs" />
-    <Compile Include="Cipher\ViginereCipher.cs" />
-    <Compile Include="Error\Error.cs" />
+    <Compile Include="Cipher\VigenereCipher.cs" />
+    <Compile Include="Error.cs" />
+    <Compile Include="Cipher\Lgram.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -63,8 +65,9 @@
     <Compile Include="Form2.Designer.cs">
       <DependentUpon>KasiskiMothod.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\ICipher.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="ICipher.cs" />
+    <Compile Include="Cipher\Pair.cs" />
+    <Compile Include="TheSimplestEncoders.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
@@ -80,6 +83,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

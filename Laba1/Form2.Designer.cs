@@ -1,4 +1,4 @@
-﻿namespace Laba1
+﻿namespace TheSimplestEncoders
 {
 	partial class Form2
 	{

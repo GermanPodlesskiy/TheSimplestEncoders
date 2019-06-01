@@ -1,200 +1,246 @@
-﻿using Laba1.Interfaces;
-using System;
+﻿using System;
+using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Laba1.Cipher
+namespace TheSimplestEncoders.Cipher
 {
-	class RotatingGrilleCipher : ICipher
-	{
-		private Error.Error error = new Error.Error();
-		private string key;
-		private const int COUNT_COLS = 4;
-		private int[,] keyMatr = new int[COUNT_COLS, COUNT_COLS];
-		char[,] tempMatrix = new Char[COUNT_COLS,COUNT_COLS];
+    public class RotatingGrilleCipher : ICipher
+    {
+        private Error _error = new Error();
+        private string _key = Convert.ToString(CountCols);
+        private const int CountCols = 4;
+        private char[,] _tempMatrix = new char[CountCols, CountCols];
 
-		private char[] characters = new char[]
-		{
-			'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
-			'O','P','Q','R','S','T','U','V','W','X','Y','Z'
-		};
+        private char[] characters = new char[]
+        {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+            'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        };
 
-		//private char[] otherCharacters = new char[]
-		//{
-		//	' ', '.', ',', '-', '"', '\'',':','(',')','*'
-		//};
+        public string Key
+        {
+            get => _key;
+            set { }
+        }
 
-		public string Key{get{return key;}set { key = Convert.ToString(COUNT_COLS); }
-		}
+        public int[,] KeyMatrix { get; set; }
 
-		public int[,] KeyMatr
-		{
-			get { return keyMatr; }
-			set { keyMatr = value; }
-		}
+        public bool Error => false;
 
-		public bool Error { get { return false; } }
+        public string Encryption(string plaintext)
+        {
+            plaintext = plaintext.ToUpper();
+            if (new RailwayFenceCipher().InputValidationPlaintext(ref plaintext))
+            {
+                return null;
+            }
 
-		public string Encryption(string plaintext)
-		{
-			plaintext = plaintext.ToUpper();
-			if (new RailwayFenceCipher().InputValidationPlaintext(ref plaintext))
-			{
-				return null;
-			}
+            var result = new StringBuilder();
+            var plaintextIndex = 0;
 
-			string result = null;
-			int plaintextIndex = 0;
+            while (plaintextIndex != plaintext.Length)
+            {
+                _tempMatrix = ClearMatrix(_tempMatrix);
+                for (var i = 0; i < CountCols; i++)
+                {
+                    if (plaintextIndex == plaintext.Length)
+                    {
+                        break;
+                    }
 
-			while (plaintextIndex != plaintext.Length)
-			{
-				tempMatrix = ClearMatrix(tempMatrix);
-				for (int i = 0; i < COUNT_COLS; i++)
-				{
-					if (plaintextIndex == plaintext.Length)
-						break;
-					for (int j = 0; j < COUNT_COLS; j++)
-						if (keyMatr[i, j] == 1)
-						{
-							if (plaintextIndex == plaintext.Length)
-								break;
+                    for (var j = 0; j < CountCols; j++)
+                    {
+                        if (KeyMatrix[i, j] != 1)
+                        {
+                            continue;
+                        }
 
-							tempMatrix[i, j] = plaintext[plaintextIndex++];
-						}
-				}
+                        if (plaintextIndex == plaintext.Length)
+                        {
+                            break;
+                        }
 
-
-				// поворот решетки на 90 градусов по часовой стрелке
-				for (int i = 0; i < COUNT_COLS; i++)
-				{
-					if (plaintextIndex == plaintext.Length)
-						break;
-					for (int j = 0; j < COUNT_COLS; j++)
-						if (keyMatr[COUNT_COLS - j - 1, i] == 1)
-						{
-							if (plaintextIndex == plaintext.Length)
-								break;
-
-							tempMatrix[i, j] = plaintext[plaintextIndex++];
-						}
-				}
-
-				// поворот решетки на 180 градусов по часовой стрелке
-				for (int i = 0; i < COUNT_COLS; i++)
-				{
-					if (plaintextIndex == plaintext.Length)
-						break;
-					for (int j = 0; j < COUNT_COLS; j++)
-						if (keyMatr[COUNT_COLS - i - 1, COUNT_COLS - j - 1] == 1)
-						{
-							if (plaintextIndex == plaintext.Length)
-								break;
-
-							tempMatrix[i, j] = plaintext[plaintextIndex++];
-						}
-				}
-
-				// поворот решетки на 270 градусов по часовой стрелке
-				for (int i = 0; i < COUNT_COLS; i++)
-				{
-					if (plaintextIndex == plaintext.Length)
-						break;
-					for (int j = 0; j < COUNT_COLS; j++)
-						if (keyMatr[j, COUNT_COLS - i - 1] == 1)
-						{
-							if (plaintextIndex == plaintext.Length)
-								break;
-
-							tempMatrix[i, j] = plaintext[plaintextIndex++];
-						}
-				}
-				foreach (char symbol in tempMatrix)
-				{
-					result += symbol;
-				}
-			}
-
-			return result;
-		}
-
-		public string Decryption(string ciphertext)
-		{
-			ciphertext = ciphertext.ToUpper();         
-			if ((ciphertext.Length % 16 != 0) || (new RailwayFenceCipher().InputValidationPlaintext(ref ciphertext)))
-			{
-				error.ValidationRotation();
-				return null;
-			}
-
-			string result = null;
-			int ciphertextIndex = 0;
-
-			while (ciphertextIndex != ciphertext.Length)
-			{
-				int bufindex = ciphertextIndex;
-				for (int i = 0; i < COUNT_COLS; i++)
-					for (int j = 0; j < COUNT_COLS; j++)
-					{
-						tempMatrix[i, j] = ciphertext[bufindex++];
-					}
-
-				for (int i = 0; i < COUNT_COLS; i++)
-				{
-					for (int j = 0; j < COUNT_COLS; j++)
-						if (keyMatr[i, j] == 1)
-						{
-							ciphertextIndex++;
-							result += tempMatrix[i, j];
-						}
-				}
+                        _tempMatrix[i, j] = plaintext[plaintextIndex++];
+                    }
+                }
 
 
-				// поворот решетки на 90 градусов по часовой стрелке
-				for (int i = 0; i < COUNT_COLS; i++)
-				{
-					for (int j = 0; j < COUNT_COLS; j++)
-						if (keyMatr[COUNT_COLS - j - 1, i] == 1)
-						{
-							ciphertextIndex++;
-							result += tempMatrix[i, j];
-						}
-				}
+                // поворот решетки на 90 градусов по часовой стрелке
+                for (var i = 0; i < CountCols; i++)
+                {
+                    if (plaintextIndex == plaintext.Length)
+                    {
+                        break;
+                    }
 
-				// поворот решетки на 180 градусов по часовой стрелке
-				for (int i = 0; i < COUNT_COLS; i++)
-				{
-					for (int j = 0; j < COUNT_COLS; j++)
-						if (keyMatr[COUNT_COLS - i - 1, COUNT_COLS - j - 1] == 1)
-						{
-							ciphertextIndex++;
-							result += tempMatrix[i, j];
-						}
-				}
+                    for (var j = 0; j < CountCols; j++)
+                    {
+                        if (KeyMatrix[CountCols - j - 1, i] != 1)
+                        {
+                            continue;
+                        }
 
-				// поворот решетки на 270 градусов по часовой стрелке
-				for (int i = 0; i < COUNT_COLS; i++)
-				{
-					for (int j = 0; j < COUNT_COLS; j++)
-						if (keyMatr[j, COUNT_COLS - i - 1] == 1)
-						{
-							ciphertextIndex++;
-							result += tempMatrix[i, j];
-						}
-				}
-			}
+                        if (plaintextIndex == plaintext.Length)
+                        {
+                            break;
+                        }
 
-			result = Regex.Replace(result, @"[^A-Z]","");
-			return result;
-		}
+                        _tempMatrix[i, j] = plaintext[plaintextIndex++];
+                    }
+                }
 
-		
-		private char[,] ClearMatrix(char[,] matrix)
-		{
-			for (int i = 0; i < COUNT_COLS; i++)
-			for (int j = 0; j < COUNT_COLS; j++)
-			{
-				matrix[i, j] = '*';
-			}	
-			return matrix;
-		}
-	}
+                // поворот решетки на 180 градусов по часовой стрелке
+                for (var i = 0; i < CountCols; i++)
+                {
+                    if (plaintextIndex == plaintext.Length)
+                    {
+                        break;
+                    }
+
+                    for (var j = 0; j < CountCols; j++)
+                    {
+                        if (KeyMatrix[CountCols - i - 1, CountCols - j - 1] != 1)
+                        {
+                            continue;
+                        }
+
+                        if (plaintextIndex == plaintext.Length)
+                        {
+                            break;
+                        }
+
+                        _tempMatrix[i, j] = plaintext[plaintextIndex++];
+                    }
+                }
+
+                // поворот решетки на 270 градусов по часовой стрелке
+                for (var i = 0; i < CountCols; i++)
+                {
+                    if (plaintextIndex == plaintext.Length)
+                    {
+                        break;
+                    }
+
+                    for (var j = 0; j < CountCols; j++)
+                    {
+                        if (KeyMatrix[j, CountCols - i - 1] != 1)
+                        {
+                            continue;
+                        }
+
+                        if (plaintextIndex == plaintext.Length)
+                        {
+                            break;
+                        }
+
+                        _tempMatrix[i, j] = plaintext[plaintextIndex++];
+                    }
+                }
+
+                foreach (var symbol in _tempMatrix)
+                {
+                    result.Append(symbol);
+                }
+            }
+
+            return result.ToString();
+        }
+
+        public string Decryption(string cipherText)
+        {
+            cipherText = cipherText.ToUpper();
+            if (cipherText.Length % 16 != 0 || new RailwayFenceCipher().InputValidationPlaintext(ref cipherText))
+            {
+                _error.ValidationRotation();
+                return null;
+            }
+
+            var result = new StringBuilder();
+            var index = 0;
+
+            while (index != cipherText.Length)
+            {
+                var bufIndex = index;
+                for (var i = 0; i < CountCols; i++)
+                for (var j = 0; j < CountCols; j++)
+                {
+                    _tempMatrix[i, j] = cipherText[bufIndex++];
+                }
+
+                for (var i = 0; i < CountCols; i++)
+                {
+                    for (var j = 0; j < CountCols; j++)
+                    {
+                        if (KeyMatrix[i, j] != 1)
+                        {
+                            continue;
+                        }
+
+                        index++;
+                        result.Append(_tempMatrix[i, j]);
+                    }
+                }
+
+
+                // поворот решетки на 90 градусов по часовой стрелке
+                for (var i = 0; i < CountCols; i++)
+                {
+                    for (var j = 0; j < CountCols; j++)
+                    {
+                        if (KeyMatrix[CountCols - j - 1, i] != 1)
+                        {
+                            continue;
+                        }
+
+                        index++;
+                        result.Append(_tempMatrix[i, j]);
+                    }
+                }
+
+                // поворот решетки на 180 градусов по часовой стрелке
+                for (var i = 0; i < CountCols; i++)
+                {
+                    for (var j = 0; j < CountCols; j++)
+                    {
+                        if (KeyMatrix[CountCols - i - 1, CountCols - j - 1] != 1)
+                        {
+                            continue;
+                        }
+
+                        index++;
+                        result.Append(_tempMatrix[i, j]);
+                    }
+                }
+
+                // поворот решетки на 270 градусов по часовой стрелке
+                for (var i = 0; i < CountCols; i++)
+                {
+                    for (var j = 0; j < CountCols; j++)
+                    {
+                        if (KeyMatrix[j, CountCols - i - 1] != 1)
+                        {
+                            continue;
+                        }
+
+                        index++;
+                        result.Append(_tempMatrix[i, j]);
+                    }
+                }
+            }
+
+            return Regex.Replace(result.ToString(), @"[^A-Z]", "");
+        }
+
+
+        private char[,] ClearMatrix(char[,] matrix)
+        {
+            for (var i = 0; i < CountCols; i++)
+            for (var j = 0; j < CountCols; j++)
+            {
+                matrix[i, j] = '*';
+            }
+
+            return matrix;
+        }
+    }
 }
